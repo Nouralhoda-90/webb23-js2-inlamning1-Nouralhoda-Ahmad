@@ -70,26 +70,22 @@ function getResult(playerHand, computerHand) {
 async function updateScore(result) {
   if (result === 'player') {
     playerScore++;
+    scoreElement.textContent = `Score: ${playerScore}`;
   } else if (result === 'computer') {
-    if (playerScore > 0) {
-      const playerHighScore = { name: playerName, score: playerScore };
-      const updatedHighScores = [...highScores, playerHighScore].sort(    // not nessary because i have already do it in the backend 
-        (a, b) => b.score - a.score
-      );
-
-      if (updatedHighScores.length > 5) {
-        updatedHighScores.pop();
-      }
-
-      highScores = updatedHighScores;
+    const topFiveScores = highScores.slice(0, 5);
+    const lowestTopScore = topFiveScores[topFiveScores.length - 1];
+    if (!lowestTopScore || playerScore > lowestTopScore.score) {
       await saveHighScores(playerName, playerScore);
-      renderHighScores();
+      await fetchHighScores();
+      
+     
+      resetGame();
+    } else {
+      resetGame();
     }
-
-    resetGame();
   }
-  scoreElement.textContent = `Score: ${playerScore}`;
 }
+
 
 // Function to save the high scores to the server
 async function saveHighScores(name, score) {
